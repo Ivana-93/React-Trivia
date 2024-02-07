@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 
-export function Question({ questions }) {
+export function Question({ questions, onReset }) {
   const [question, setQuestion] = useState("");
   const [shuffledAnswers, setShuffledAnswers] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -19,8 +19,8 @@ export function Question({ questions }) {
 
   function shuffleList(shuffledList) {
     for (let i = shuffledList.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1)); // Generiranje slučajnog indeksa
-      [shuffledList[i], shuffledList[j]] = [shuffledList[j], shuffledList[i]]; // Zamjena elemenata na pozicijama i i j
+      const j = Math.floor(Math.random() * (i + 1)); // Generating randon index
+      [shuffledList[i], shuffledList[j]] = [shuffledList[j], shuffledList[i]]; // Switch position i and j
     }
     return shuffledList;
   }
@@ -65,30 +65,32 @@ export function Question({ questions }) {
 
   return (
     <div className="container">
-      <form className="question">
-        {!isFinished && question && (
-          <h3 className="question-text">
-            {currentIndex + 1}. {question}
-          </h3>
-        )}
-        {!isFinished && shuffledAnswers && (
-          <ul className="answers">
-            {shuffledAnswers.map((answer, index) => (
-              <div className="answer-text" key={index}>
-                <input
-                  type="radio"
-                  style={{ marginRight: "10%" }}
-                  id={`answer${index}`}
-                  name="answers"
-                  value={answer}
-                  checked={selectedAnswer === answer}
-                  onChange={() => handleAnswerChange(answer)}
-                />
-                <label htmlFor={`answer${index}`}>{answer}</label>
-              </div>
-            ))}
-          </ul>
-        )}
+      <form className="form">
+        <div className="question">
+          {!isFinished && question && (
+            <h3 className="question-text">
+              {currentIndex + 1}. {question}
+            </h3>
+          )}
+          {!isFinished && shuffledAnswers && (
+            <ul className="answers">
+              {shuffledAnswers.map((answer, index) => (
+                <div className="answer-text" key={index}>
+                  <input
+                    type="radio"
+                    style={{ marginRight: "10%" }}
+                    id={`answer${index}`}
+                    name="answers"
+                    value={answer}
+                    checked={selectedAnswer === answer}
+                    onChange={() => handleAnswerChange(answer)}
+                  />
+                  <label htmlFor={`answer${index}`}>{answer}</label>
+                </div>
+              ))}
+            </ul>
+          )}
+        </div>
         {currentIndex === questions.length - 1 ? (
           <button
             className="question-button"
@@ -103,6 +105,7 @@ export function Question({ questions }) {
             className="question-button"
             type="button"
             onClick={handleNextQuestionButtonClick}
+            disabled={!selectedAnswer}
           >
             Next
           </button>
@@ -117,11 +120,7 @@ export function Question({ questions }) {
           {4 <= result && result <= 7 && <p className="description"> {mid}</p>}
           {result > 7 && <p className="description">{good}</p>}
           {
-            <button
-              className="again-button"
-              type="button"
-            
-            >
+            <button className="again-button" type="button" onClick={onReset}>
               Try again
             </button>
           }
